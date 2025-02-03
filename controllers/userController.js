@@ -34,6 +34,10 @@ const validateUserData = (data) => {
   });
 };
 
+function excelSerialToDate(serial) {
+  const excelEpoch = new Date(1900, 0, 1);
+  return new Date(excelEpoch.getTime() + (serial - 1) * 24 * 60 * 60 * 1000);
+}
 const postUploadUsers = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
@@ -48,8 +52,10 @@ const postUploadUsers = async (req, res) => {
     const workbook = XLSX.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
     const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    // console.log("jsonData", jsonData);
 
     const validatedData = validateUserData(jsonData);
+    console.log("validatedData", validatedData);
 
     const validUsers = validatedData
       .filter((item) => item.errors.length === 0)
@@ -57,7 +63,7 @@ const postUploadUsers = async (req, res) => {
         first_name: item.user["First Name"],
         last_name: item.user["Last Name"],
         role: item.user["Role"],
-        dob: new Date(item.user["DOB"]),
+        dob: excelSerialToDate(item.user["DOB"]).toISOString().split("T")[0],
         gender: item.user["Gender"],
         email: item.user["Email"],
         mobile: item.user["Mobile"],
