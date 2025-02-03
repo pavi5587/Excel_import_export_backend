@@ -66,6 +66,7 @@ const postUploadUsers = async (req, res) => {
         created_at: new Date(),
         updated_at: new Date(),
       }));
+    console.log("validUsers", validUsers);
 
     const invalidUsers = validatedData
       .filter((item) => item.errors.length > 0)
